@@ -1,3 +1,4 @@
+const Vec3 = require("vec3")
 const motion = require("./src/inject/motion")
 
 module.exports.plugin = function inject(bot) {
@@ -70,11 +71,39 @@ class Plugin {
         return 0
     }
 
-    velocityXZ(velocity, slip, movement, effects, onGround) {
+    getVelocity(entity, walking, sprinting, jumping) {
+        const st = entity.onGround ? this.getSlip(entity.position) : 1
+        const su = entity.onGround ? this.getSlip(entity.lastPos)  : 1
+        const m  = this.getMovement(entity)
+        const e  = this.getEffects(entity)
 
-    }
+        // calculate momentum component
+        let xm, zm
+        xm = (entity.position.x - entity.lastPos.x) * su * 0.91
+        zm = (entity.position.z - entity.lastPos.z) * su * 0.91
 
-    velocityY(velocity, slip, movement, boost) {
+        // calculate acceleration component
+        let xa, za
+        if (walking) {
+            xa = entity.onGround
+            ? 0.1 * m * e * (0.6/st) ** 3 * Math.sin(entity.yaw)
+            : 0.02 * m * Math.sin(entity.yaw)
 
+            za = entity.onGround
+            ? 0.1 * m * e * (0.6/st) ** 3 * Math.cos(entity.yaw)
+            : 0.02 * m * Math.cos(entity.yaw)
+        } else
+            xa = za = 0
+
+        // calculate velocity
+        let x, z
+        x = xm + xa + (entity.onGround && sprinting && jumping ? 0.2 : 0)
+        z = zm + za + (entity.onGround && sprinting && jumping ? 0.2 : 0)
+
+        let y = entity.onGround && jumping
+        ? 0.42 + this.getJumpBoost(entity)
+        : (entity.position.y - entity.lastPos.y - 0.08) * 0.98
+
+        return new Vec3(x, y, z)
     }
 }
