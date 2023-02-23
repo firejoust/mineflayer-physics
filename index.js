@@ -24,32 +24,21 @@ class Plugin {
         if (entity.attributes === undefined) return 1.0
         const speed = entity.attributes["minecraft:generic.movement_speed"].value
         const mod   = entity.attributes["minecraft:generic.movement_speed"].modifiers
-
-        // multiply has base or non-base operation
-        const multiplier_base = []
-        const multiplier_none = []
-        let degree_add = 0
-
-        // collect attribute modifier values
-        mod.forEach(modifier => {
-            if (modifier.operation === 0) // add
-                degree_add += modifier.amount
-            else
-                if (modifier.operation === 1) // multiply base
-                    multiplier_base.push(modifier.amount)
-                else
-                    if (modifier.operation === 2) // multiply
-                        multiplier_none.push(modifier.amount)
-        })
+        let final = speed
 
         // apply modifiers to final value
-        let final = speed
-        multiplier_base.forEach(i => final += speed * (1 + i))
-        multiplier_none.forEach(i => final += speed * i)
-        final += degree_add
+        mod.forEach(modifier => {
+            if (modifier.operation === 0) // add
+                final += modifier.amount
+            else
+                if (modifier.operation === 1) // multiply base
+                    final += speed * (1 + i)
+                else
+                    if (modifier.operation === 2) // multiply
+                        final += speed * i
+        })
 
-        // todo: crouch
-        return final * 10
+        return 10 * final
     }
 
     getJumpBoost(entity) {
