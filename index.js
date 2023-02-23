@@ -32,10 +32,10 @@ class Plugin {
                 final += modifier.amount
             else
                 if (modifier.operation === 1) // multiply base
-                    final += speed * (1 + i)
+                    final += speed * (1 + modifier.amount)
                 else
                     if (modifier.operation === 2) // multiply
-                        final += speed * i
+                        final += speed * modifier.amount
         })
 
         return 10 * final
