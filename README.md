@@ -11,6 +11,10 @@
 - Predict player velocity in the current tick (supports attributes & effects)
 - (WIP) Simulate a player's trajectory over a period of time
 - (WIP) Get applicable control states for long jumps (airborne obstacle avoidance)
+#### Notes
+In order to get velocity in the last tick, this plugin will inject a new property named `lastPos` into all entities
+
+(updated per tick)
 ### API
 #### Types
 ```js
