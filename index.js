@@ -2,7 +2,7 @@ const Vec3 = require("vec3")
 const motion = require("./src/inject/motion")
 
 module.exports.plugin = function inject(bot) {
-    bot.physics = new Plugin(bot)
+    bot.physics.api = new Plugin(bot)
     motion.inject(bot)
 }
 
@@ -24,17 +24,19 @@ class Plugin {
         let speed = 0
         let slowness = 0
 
-        for (let effect of entity.effects) {
-            if (effect.id === 1) speed = effect.amplifier
-            if (effect.id === 2) slowness = effect.amplifier
+        for (let id in entity.effects) {
+            if (id === 1) speed = entity.effects[id].amplifier
+            if (id === 2) slowness = entity.effects[id].amplifier
         }
 
         return (1 + 0.2 * speed) * (1 - 0.15 * slowness)
     }
 
     getMovement(entity) {
-        const speed = entity.attributes["minecraft:generic.movement_speed"].value
-        const mod   = entity.attributes["minecraft:generic.movement_speed"].modifiers
+        const speed = entity.attributes["minecraft:generic.movement_speed"]?.value
+        const mod   = entity.attributes["minecraft:generic.movement_speed"]?.modifiers
+        if (mod === undefined) return 1
+
         // multiply has base or non-base operation
         let multipliers = []
         let base = true
@@ -60,13 +62,14 @@ class Plugin {
         } else
             multipliers.forEach(i => degree_mult += (1 + i))
 
-        return (speed * degree_mult + degree_add) *
-        entity.crouching ? 0.3 : 1
+        console.log(`speed: ${speed}, degree_mult: ${degree_mult}, degree_add: ${degree_add}`)
+
+        return (10 * speed * degree_mult + degree_add) * (entity.crouching ? 0.3 : 1)
     }
 
     getJumpBoost(entity) {
-        for (let effect of entity.effects) {
-            if (effect.id === 8) return effect.amplifier * 0.2
+        for (let id in entity.effects) {
+            if (id === 8) return entity.effects[id].amplifier * 0.2
         }
         return 0
     }
@@ -77,10 +80,17 @@ class Plugin {
         const m  = this.getMovement(entity)
         const e  = this.getEffects(entity)
 
+        console.log(`m: ${m}, e: ${e}, st: ${st}, su: ${su}`)
+
         // calculate momentum component
         let xm, zm
         xm = (entity.position.x - entity.lastPos.x) * su * 0.91
         zm = (entity.position.z - entity.lastPos.z) * su * 0.91
+
+        
+        // todo: account for ft and dt
+        // todo: fix angles not working
+
 
         // calculate acceleration component
         let xa, za
@@ -103,6 +113,9 @@ class Plugin {
         let y = entity.onGround && jumping
         ? 0.42 + this.getJumpBoost(entity)
         : (entity.position.y - entity.lastPos.y - 0.08) * 0.98
+
+        console.log(`xm: ${xm}, xa: ${xa}, x: ${x}`)
+        console.log(`zm: ${zm}, za: ${za}, z: ${z}`)
 
         return new Vec3(x, y, z)
     }
