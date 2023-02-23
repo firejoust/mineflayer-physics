@@ -39,7 +39,7 @@ bot.loadPlugin(physics.plugin)
   
   Arguments:
   -    entity (PrismarineEntity): the player's entity
-  -   walking (boolean): if the player is moving forwards (bot.getControlState(
+  -   walking (boolean): if the player is moving forwards
   - sprinting (boolean): if the player is sprinting
   -   jumping (boolean): if the player is jumping
   
