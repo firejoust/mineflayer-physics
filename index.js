@@ -20,57 +20,42 @@ class Plugin {
              : 0.6
     }
 
-    getEffects(entity) {
-        let speed = 0
-        let slowness = 0
-
-        for (let id in entity.effects) {
-            if (id === 1) speed = entity.effects[id].amplifier
-            if (id === 2) slowness = entity.effects[id].amplifier
-        }
-
-        return (1 + 0.2 * speed) * (1 - 0.15 * slowness)
-    }
-
     getMovement(entity) {
-        const speed = entity.attributes["minecraft:generic.movement_speed"]?.value
-        const mod   = entity.attributes["minecraft:generic.movement_speed"]?.modifiers
-        if (mod === undefined) return 1
+        if (entity.attributes === undefined) return 1.0
+        const speed = entity.attributes["minecraft:generic.movement_speed"].value
+        const mod   = entity.attributes["minecraft:generic.movement_speed"].modifiers
 
         // multiply has base or non-base operation
-        let multipliers = []
-        let base = true
+        const multiplier_base = []
+        const multiplier_none = []
+        let degree_add = 0
 
-        // final value modifiers
-        let degree_mult = 0
-        let degree_add  = 0
-
-        // get add degree, gather multiply candidates
+        // collect attribute modifier values
         mod.forEach(modifier => {
-            if (modifier.operation === 0)
+            if (modifier.operation === 0) // add
                 degree_add += modifier.amount
-            else {
-                if (modifier.operation === 2) base = false
-                multipliers.push(modifier.amount)
-            }
+            else
+                if (modifier.operation === 1) // multiply base
+                    multiplier_base.push(modifier.amount)
+                else
+                    if (modifier.operation === 2) // multiply
+                        multiplier_none.push(modifier.amount)
         })
 
-        // get the degree using multiply candidates
-        if (base) {
-            degree_mult = 1
-            multipliers.forEach(i => degree_mult += i)
-        } else
-            multipliers.forEach(i => degree_mult += (1 + i))
+        // apply modifiers to final value
+        let final = speed
+        multiplier_base.forEach(i => final += speed * (1 + i))
+        multiplier_none.forEach(i => final += speed * i)
+        final += degree_add
 
-        console.log(`speed: ${speed}, degree_mult: ${degree_mult}, degree_add: ${degree_add}`)
-
-        return (10 * speed * degree_mult + degree_add) * (entity.crouching ? 0.3 : 1)
+        // todo: crouch
+        return final * 10
     }
 
     getJumpBoost(entity) {
-        for (let id in entity.effects) {
-            if (id === 8) return entity.effects[id].amplifier * 0.2
-        }
+        for (let id in entity.effects)
+            if (id == 8)
+                return entity.effects[id].amplifier * 0.1
         return 0
     }
 
@@ -78,44 +63,36 @@ class Plugin {
         const st = entity.onGround ? this.getSlip(entity.position) : 1
         const su = entity.onGround ? this.getSlip(entity.lastPos)  : 1
         const m  = this.getMovement(entity)
-        const e  = this.getEffects(entity)
-
-        console.log(`m: ${m}, e: ${e}, st: ${st}, su: ${su}`)
 
         // calculate momentum component
         let xm, zm
         xm = (entity.position.x - entity.lastPos.x) * su * 0.91
         zm = (entity.position.z - entity.lastPos.z) * su * 0.91
 
-        
-        // todo: account for ft and dt
-        // todo: fix angles not working
-
-
         // calculate acceleration component
         let xa, za
         if (walking) {
             xa = entity.onGround
-            ? 0.1 * m * e * (0.6/st) ** 3 * Math.sin(entity.yaw)
-            : 0.02 * m * Math.sin(entity.yaw)
+            ? 0.1 * m * (0.6/st) ** 3 * -Math.sin(entity.yaw)
+            : 0.02 * m * -Math.sin(entity.yaw)
 
             za = entity.onGround
-            ? 0.1 * m * e * (0.6/st) ** 3 * Math.cos(entity.yaw)
-            : 0.02 * m * Math.cos(entity.yaw)
+            ? 0.1 * m * (0.6/st) ** 3 * -Math.cos(entity.yaw)
+            : 0.02 * m * -Math.cos(entity.yaw)
         } else
             xa = za = 0
 
         // calculate velocity
         let x, z
-        x = xm + xa + (entity.onGround && sprinting && jumping ? 0.2 : 0)
-        z = zm + za + (entity.onGround && sprinting && jumping ? 0.2 : 0)
+        x = xm + xa + (entity.onGround && sprinting && jumping ? 0.2 * -Math.sin(entity.yaw) : 0)
+        z = zm + za + (entity.onGround && sprinting && jumping ? 0.2 * -Math.cos(entity.yaw) : 0)
 
         let y = entity.onGround && jumping
         ? 0.42 + this.getJumpBoost(entity)
         : (entity.position.y - entity.lastPos.y - 0.08) * 0.98
 
-        console.log(`xm: ${xm}, xa: ${xa}, x: ${x}`)
-        console.log(`zm: ${zm}, za: ${za}, z: ${z}`)
+        if (entity.onGround && y < 0.003)
+            y = 0
 
         return new Vec3(x, y, z)
     }
