@@ -21,6 +21,23 @@ In order to get velocity in the last tick, this plugin will inject a new propert
 class PrismarineEntity; // https://github.com/PrismarineJS/prismarine-entity
 class Vec3;             // https://github.com/PrismarineJS/node-vec3
 ```
+```ts
+/*
+  https://github.com/PrismarineJS/mineflayer/blob/2c7103062535c12746c312371e647a7b141547bd/index.d.ts#L526-L534
+*/
+
+// NOTE: currently only forward, sprint & jump are supported
+
+interface ControlStateStatus {
+  forward: boolean
+  back: boolean
+  left: boolean
+  right: boolean
+  jump: boolean
+  sprint: boolean
+  sneak: boolean
+}
+```
 #### Loading the plugin
 ```js
 const mineflayer = require("mineflayer")
@@ -38,12 +55,10 @@ bot.loadPlugin(physics.plugin)
   Get the player's velocity in the current tick
   
   Arguments:
-  -    entity (PrismarineEntity): the player's entity
-  -   walking (boolean): if the player is moving forwards
-  - sprinting (boolean): if the player is sprinting
-  -   jumping (boolean): if the player is jumping
+  - entity (PrismarineEntity): the player's entity
+  - controlState (ControlStateStatus): the player's active control states
   
   Returns: Vec3
 */
-bot.physics.api.getVelocity(entity, walking, sprinting, jumping)
+bot.physics.api.getVelocity(entity, controlState)
 ```

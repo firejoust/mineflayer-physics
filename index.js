@@ -48,7 +48,7 @@ class Plugin {
         return 0
     }
 
-    getVelocity(entity, walking, sprinting, jumping) {
+    getVelocity(entity, controlState) {
         const st = entity.onGround ? this.getSlip(entity.position) : 1
         const su = entity.onGround ? this.getSlip(entity.lastPos)  : 1
         const m  = this.getMovement(entity)
@@ -60,7 +60,7 @@ class Plugin {
 
         // calculate acceleration component
         let xa, za
-        if (walking) {
+        if (controlState["forward"]) {
             xa = entity.onGround
             ? 0.1 * m * (0.6/st) ** 3 * -Math.sin(entity.yaw)
             : 0.02 * m * -Math.sin(entity.yaw)
@@ -73,10 +73,10 @@ class Plugin {
 
         // calculate velocity
         let x, z
-        x = xm + xa + (entity.onGround && sprinting && jumping ? 0.2 * -Math.sin(entity.yaw) : 0)
-        z = zm + za + (entity.onGround && sprinting && jumping ? 0.2 * -Math.cos(entity.yaw) : 0)
+        x = xm + xa + (entity.onGround && controlState["sprint"] && controlState["jump"] ? 0.2 * -Math.sin(entity.yaw) : 0)
+        z = zm + za + (entity.onGround && controlState["sprint"] && controlState["jump"] ? 0.2 * -Math.cos(entity.yaw) : 0)
 
-        let y = entity.onGround && jumping
+        let y = entity.onGround && controlState["jump"]
         ? 0.42 + this.getJumpBoost(entity)
         : (entity.position.y - entity.lastPos.y - 0.08) * 0.98
 
