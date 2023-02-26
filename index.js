@@ -1,88 +1,59 @@
 const Vec3 = require("vec3")
-const motion = require("./src/inject/motion")
+const { Physics, PlayerState } = require("prismarine-physics")
+const Minecraft = require("node-minecraft-data")
+const Motion = require("./src/inject/motion")
 
 module.exports.plugin = function inject(bot) {
     bot.physics.api = new Plugin(bot)
-    motion.inject(bot)
+    Motion.inject(bot)
+}
+
+function Player() {
+    this.position
+    this.velocity
+    this.onGround
+    this.isInWater
+    this.isInLava
+    this.isInWeb
+    this.isCollidedHorizontally
+    this.isCollidedVertically
+    this.jumpTicks
+    this.jumpQueued
 }
 
 class Plugin {
     constructor(bot) {
         this.bot = bot
+        this.physics = Physics(Minecraft(bot.version), bot.world)
     }
 
-    getSlip(location) {
-        const block = this.bot.blockAt(location.offset(0, -1, 0))
-        return block.name === "slime_block" ? 0.8
-             : block.name === "ice"         ? 0.98
-             : block.name === "packed_ice"  ? 0.98
-             : block.name === "blue_ice"    ? 0.989
-             : 0.6
+    getPlayerState(entity, controlState) {
+        return new PlayerState({
+            entity: {
+                position: entity.position.clone(),
+                lastPos: entity.lastPos.clone(),
+                onGround: entity.onGround,
+                isInWater: entity.isInWater,
+                isInLava: entity.isInLava,
+                isInWeb: entity.isInWeb,
+                isCollidedHorizontally: entity.isCollidedHorizontally,
+                isCollidedVertically: entity.isCollidedVertically,
+                yaw: entity.yaw
+            },
+            jumpTicks: 0,
+            jumpQueued: controlState["jump"]
+        }, controlState)
     }
 
-    getMovement(entity) {
-        if (entity.attributes === undefined) return 1.0
-        const speed = entity.attributes["minecraft:generic.movement_speed"].value
-        const mod   = entity.attributes["minecraft:generic.movement_speed"].modifiers
-        let final = speed
-
-        // apply modifiers to final value
-        mod.forEach(modifier => {
-            if (modifier.operation === 0) // add
-                final += modifier.amount
-            else
-                if (modifier.operation === 1) // multiply base
-                    final += speed * (1 + modifier.amount)
-                else
-                    if (modifier.operation === 2) // multiply
-                        final += speed * modifier.amount
-        })
-
-        return 10 * final
-    }
-
-    getJumpBoost(entity) {
-        for (let id in entity.effects)
-            if (id == 8)
-                return entity.effects[id].amplifier * 0.1
-        return 0
+    getPhysics(entity, controlState) {
+        const state = this.getPlayerState(entity, controlState)
+        const player = new Player()
+        // update player with current physics state
+        this.physics.simulatePlayer(state, this.bot.world).apply(player)
+        return player
     }
 
     getVelocity(entity, controlState) {
-        const st = entity.onGround ? this.getSlip(entity.position) : 1
-        const su = entity.onGround ? this.getSlip(entity.lastPos)  : 1
-        const m  = this.getMovement(entity)
-
-        // calculate momentum component
-        let xm, zm
-        xm = (entity.position.x - entity.lastPos.x) * su * 0.91
-        zm = (entity.position.z - entity.lastPos.z) * su * 0.91
-
-        // calculate acceleration component
-        let xa, za
-        if (controlState["forward"]) {
-            xa = entity.onGround
-            ? 0.1 * m * (0.6/st) ** 3 * -Math.sin(entity.yaw)
-            : 0.02 * m * -Math.sin(entity.yaw)
-
-            za = entity.onGround
-            ? 0.1 * m * (0.6/st) ** 3 * -Math.cos(entity.yaw)
-            : 0.02 * m * -Math.cos(entity.yaw)
-        } else
-            xa = za = 0
-
-        // calculate velocity
-        let x, z
-        x = xm + xa + (entity.onGround && controlState["sprint"] && controlState["jump"] ? 0.2 * -Math.sin(entity.yaw) : 0)
-        z = zm + za + (entity.onGround && controlState["sprint"] && controlState["jump"] ? 0.2 * -Math.cos(entity.yaw) : 0)
-
-        let y = entity.onGround && controlState["jump"]
-        ? 0.42 + this.getJumpBoost(entity)
-        : (entity.position.y - entity.lastPos.y - 0.08) * 0.98
-
-        if (entity.onGround && y < 0.003)
-            y = 0
-
-        return new Vec3(x, y, z)
+        return this.getPhysics(entity, controlState).velocity
     }
 }
