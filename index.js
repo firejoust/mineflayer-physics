@@ -1,5 +1,5 @@
 const { Physics, PlayerState } = require("prismarine-physics")
-const Minecraft = require("node-minecraft-data")
+const Minecraft = require("minecraft-data")
 const Motion = require("./src/inject/motion")
 
 module.exports.plugin = function inject(bot) {
@@ -8,22 +8,25 @@ module.exports.plugin = function inject(bot) {
 }
 
 function Player() {
-    this.position
-    this.velocity
-    this.onGround
-    this.isInWater
-    this.isInLava
-    this.isInWeb
-    this.isCollidedHorizontally
-    this.isCollidedVertically
+    this.entity = {}
     this.jumpTicks
     this.jumpQueued
+    // entity properties
+    this.entity.position
+    this.entity.velocity
+    this.entity.onGround
+    this.entity.isInWater
+    this.entity.isInLava
+    this.entity.isInWeb
+    this.entity.isCollidedHorizontally
+    this.entity.isCollidedVertically
+
 }
 
 class Plugin {
     constructor(bot) {
         this.bot = bot
-        this.physics = Physics(Minecraft(bot.version), bot.world)
+        this.physics = Physics(Minecraft(bot.majorVersion), bot.world)
     }
 
     getPlayerState(entity, controlState) {
@@ -37,10 +40,14 @@ class Plugin {
                 isInWeb: entity.isInWeb,
                 isCollidedHorizontally: entity.isCollidedHorizontally,
                 isCollidedVertically: entity.isCollidedVertically,
+                attributes: entity.attributes,
+                effects: entity.effects,
                 yaw: entity.yaw
             },
+            inventory: { slots: [] },
             jumpTicks: 0,
-            jumpQueued: controlState["jump"]
+            jumpQueued: controlState["jump"],
+            version: this.bot.majorVersion
         }, controlState)
     }
 
