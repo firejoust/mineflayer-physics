@@ -8,8 +8,8 @@
 
 ### Features
 #### Overview
-- Predict player velocity in the current tick (supports attributes & effects)
-- (WIP) Simulate a player's trajectory over a period of time
+- Predict player physics in the current/next tick (position, velocity, etc)
+- (WIP) Simulate a player's trajectory over a period of ticks
 - (WIP) Get applicable control states for long jumps (airborne obstacle avoidance)
 #### Notes
 In order to get velocity in the last tick, this plugin will inject a new property named `lastPos` into all entities
@@ -25,8 +25,6 @@ class Vec3;             // https://github.com/PrismarineJS/node-vec3
 /*
   https://github.com/PrismarineJS/mineflayer/blob/2c7103062535c12746c312371e647a7b141547bd/index.d.ts#L526-L534
 */
-
-// NOTE: currently only forward, sprint & jump are supported
 
 interface ControlStateStatus {
   forward: boolean
