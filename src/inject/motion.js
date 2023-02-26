@@ -3,8 +3,7 @@ module.exports.inject = bot => {
 }
 
 function injectMotion(bot) {
-    // init with noop
-    let nextTickLastPos  = () => {}
+    let nextTickLastPos  = () => {} // noop
 
     bot.on("physicsTick", function update () {
         tickLastPos(bot, nextTickLastPos)

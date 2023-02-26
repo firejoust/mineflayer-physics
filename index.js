@@ -1,4 +1,3 @@
-const Vec3 = require("vec3")
 const { Physics, PlayerState } = require("prismarine-physics")
 const Minecraft = require("node-minecraft-data")
 const Motion = require("./src/inject/motion")
@@ -31,7 +30,7 @@ class Plugin {
         return new PlayerState({
             entity: {
                 position: entity.position.clone(),
-                lastPos: entity.lastPos.clone(),
+                velocity: entity.position.minus(entity.lastPos),
                 onGround: entity.onGround,
                 isInWater: entity.isInWater,
                 isInLava: entity.isInLava,
@@ -51,9 +50,5 @@ class Plugin {
         // update player with current physics state
         this.physics.simulatePlayer(state, this.bot.world).apply(player)
         return player
-    }
-
-    getVelocity(entity, controlState) {
-        return this.getPhysics(entity, controlState).velocity
     }
 }
