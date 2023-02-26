@@ -52,7 +52,7 @@ bot.loadPlugin(physics.plugin)
 #### Methods
 ```js
 /*
-  Get the player's velocity in the current tick
+  Get the player's physics in the current tick
   
   Arguments:
   - entity (PrismarineEntity): the player's entity
@@ -60,5 +60,5 @@ bot.loadPlugin(physics.plugin)
   
   Returns: Vec3
 */
-bot.physics.api.getVelocity(entity, controlState)
+bot.physics.api.getPhysics(entity, controlState)
 ```
