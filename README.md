@@ -10,7 +10,7 @@
 #### Overview
 - Predict player motion in the next tick (position, velocity, etc)
 - (WIP) Simulate a player's trajectory over a period of ticks
-- (WIP) Get applicable control states for long jumps (airborne obstacle avoidance)
+- (WIP) Use vector pathfinding approach to get applicable control states (obstacle avoidance)
 #### Notes
 In order to get velocity in the last tick, this plugin will inject a new property named `lastPos` into all entities
 
