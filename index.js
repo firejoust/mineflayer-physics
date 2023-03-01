@@ -57,4 +57,9 @@ class Plugin {
         this.physics.simulatePlayer(state, this.bot.world).apply(player)
         return player.entity
     }
+
+    getControls(entity) {
+        // get lastPos and lastVel
+        // compare new pos to current pos
+    }
 }
