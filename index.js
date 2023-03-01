@@ -55,6 +55,6 @@ class Plugin {
         const player = new Player()
         // update player with current physics state
         this.physics.simulatePlayer(state, this.bot.world).apply(player)
-        return player
+        return player.entity
     }
 }
