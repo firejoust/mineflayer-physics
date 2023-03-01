@@ -8,7 +8,7 @@
 
 ### Features
 #### Overview
-- Predict player physics in the current/next tick (position, velocity, etc)
+- Predict player motion in the next tick (position, velocity, etc)
 - (WIP) Simulate a player's trajectory over a period of ticks
 - (WIP) Get applicable control states for long jumps (airborne obstacle avoidance)
 #### Notes
