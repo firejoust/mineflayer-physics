@@ -8,19 +8,18 @@ module.exports.plugin = function inject(bot) {
 }
 
 function Player() {
-    this.entity = {}
-    this.jumpTicks
-    this.jumpQueued
-    // entity properties
-    this.entity.position
-    this.entity.velocity
-    this.entity.onGround
-    this.entity.isInWater
-    this.entity.isInLava
-    this.entity.isInWeb
-    this.entity.isCollidedHorizontally
-    this.entity.isCollidedVertically
-
+    this.jumpTicks = null
+    this.jumpQueued = null
+    this.entity = {
+        position: null,
+        velocity: null,
+        onGround: null,
+        isInWater: null,
+        isInLava: null,
+        isInWeb: null,
+        isCollidedHorizontally: null,
+        isCollidedVertically: null
+    }
 }
 
 class Plugin {
