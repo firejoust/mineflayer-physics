@@ -65,5 +65,5 @@ function copyStates(entity) {
     entity.lastState.isInWeb   = entity._lastState.isInWeb
     entity.lastState.isCollidedHorizontally = entity._lastState.isCollidedHorizontally
     entity.lastState.isCollidedVertically   = entity._lastState.isCollidedVertically
-    return b
+    return entity.lastState
 }
