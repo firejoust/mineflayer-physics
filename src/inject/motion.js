@@ -15,10 +15,12 @@ function stateHandler(bot) {
 
         // initialise lastState if not already set
         for (let entity of entities)
-            if (entity.type === "player")
-                entity._lastState = entity._lastState === undefined
-                ? new EntityState(entity)
-                : updateStates(entity)
+            if (entity.type === "player") 
+                if (entity._lastState === undefined) {
+                    entity._lastState = new EntityState(entity)
+                    entity.lastState  = new EntityState(entity)
+                } else
+                    updateStates(entity)
 
         // copy the saved state from the last tick
         nextTick = function tick() {
@@ -34,6 +36,7 @@ function stateHandler(bot) {
 // black magic 🪄
 
 function EntityState(state) {
+    this.yaw       = state.yaw
     this.position  = state.position.clone()
     this.velocity  = state.velocity.clone()
     this.onGround  = state.onGround
@@ -45,6 +48,7 @@ function EntityState(state) {
 }
 
 function updateStates(entity) {
+    entity._lastState.yaw       = entity.yaw
     entity._lastState.position  = entity.position.clone()
     entity._lastState.velocity  = entity.velocity.clone()
     entity._lastState.onGround  = entity.onGround
@@ -57,6 +61,7 @@ function updateStates(entity) {
 }
 
 function copyStates(entity) {
+    entity.lastState.yaw       = entity._lastState.yaw
     entity.lastState.position  = entity._lastState.position.clone()
     entity.lastState.velocity  = entity._lastState.velocity.clone()
     entity.lastState.onGround  = entity._lastState.onGround
