@@ -32,7 +32,7 @@ class Plugin {
         return new PlayerState({
             entity: {
                 position: entity.position.clone(),
-                velocity: entity.position.minus(entity.lastPos),
+                velocity: entity.velocity.clone(),
                 onGround: entity.onGround,
                 isInWater: entity.isInWater,
                 isInLava: entity.isInLava,

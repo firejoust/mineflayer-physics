@@ -31,7 +31,7 @@ function stateHandler(bot) {
     })
 }
 
-// black magic
+// black magic 🪄
 
 function EntityState(state) {
     this.position  = state.position.clone()
@@ -53,7 +53,7 @@ function updateStates(entity) {
     entity._lastState.isInWeb   = entity.isInWeb
     entity._lastState.isCollidedHorizontally = entity.isCollidedHorizontally
     entity._lastState.isCollidedVertically   = entity.isCollidedVertically
-    return state
+    return entity._lastState
 }
 
 function copyStates(entity) {
