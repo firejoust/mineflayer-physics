@@ -9,6 +9,7 @@
 ### Features
 #### Overview
 - Predict player motion in the next tick (position, velocity, etc)
+- (WIP) Predict a player's control states based on their velocity
 - (WIP) Simulate a player's trajectory over a period of ticks
 - (WIP) Use vector pathfinding approach to get applicable control states (obstacle avoidance)
 #### Notes
