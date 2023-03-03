@@ -67,6 +67,7 @@ class Plugin {
 
         // jump launch
         controls["jump"] = (entity.position.y - player.entity.position.y) > 0
+        controls["sneak"] = Boolean(entity.crouching)
 
         // difference between simulated/actual velocity
         if (diffAngle !== 0) {
