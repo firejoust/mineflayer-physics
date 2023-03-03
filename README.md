@@ -11,7 +11,7 @@
 - Predict player motion in the next tick (position, velocity, etc)
 - (WIP) Predict a player's control states based on their velocity
 - (WIP) Simulate a player's trajectory over a period of ticks
-- (WIP) Use vector pathfinding approach to get applicable control states (obstacle avoidance)
+- (WIP) Find ideal control states to move in a certain direction (obstacle avoidance)
 #### Notes
 In order to get velocity in the last tick, this plugin will inject a new property named `lastPos` into all entities
 
