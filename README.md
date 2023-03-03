@@ -13,7 +13,7 @@
 - (WIP) Simulate a player's trajectory over a period of ticks
 - (WIP) Find ideal control states to move in a certain direction (obstacle avoidance)
 #### Notes
-In order to get velocity in the last tick, this plugin will inject a new property named `lastPos` into all entities
+In order to get information from the last tick, this plugin will inject a new property named `lastState` into all players
 
 (updated per tick)
 ### API
