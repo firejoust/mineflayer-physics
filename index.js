@@ -56,23 +56,17 @@ class Plugin {
     getControls(entity) {
         const controls = new ControlState()
 
-        /*
-            problem: we cannot see other entity's velocity.
-        */
-
         // initialise the simulated player state
         const player = new Player()
         const state = fromLastState(this.bot.majorVersion, entity, new ControlState())
         this.physics.simulatePlayer(state, this.bot.world).apply(player)
 
-        // get difference between simulated velocity vs. real velocity
-        const diff = player.entity.velocity.minus(entity.velocity)
+        // get difference between simulated pos vs. real pos
+        const diff = player.entity.position.minus(entity.position)
         const diffAngle = Math.atan2(diff.x, diff.z)
 
         // jump launch
         controls["jump"] = (entity.position.y - player.entity.position.y) > 0
-
-        console.log(diffAngle)
 
         // difference between simulated/actual velocity
         if (diffAngle !== 0) {
@@ -99,7 +93,6 @@ class Plugin {
             }
         }
 
-        console.log(controls)
         return controls
     }
 }
