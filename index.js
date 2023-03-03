@@ -1,7 +1,8 @@
 const { fromEntity, fromLastState } = require("./src/playerstate")
 const { Physics } = require("prismarine-physics")
-const Minecraft = require("minecraft-data")
-const Motion = require("./src/inject/motion")
+const Minecraft   = require("minecraft-data")
+const Motion      = require("./src/inject/motion")
+const Angle       = require("./src/utils/angle")
 
 module.exports.plugin = function inject(bot) {
     bot.physics.api = new Plugin(bot)
@@ -55,17 +56,12 @@ class Plugin {
         const state = fromLastState(this.bot.majorVersion, entity, new ControlState())
         this.physics.simulatePlayer(state, this.bot.world).apply(player)
 
-        /*
-        // take a difference between actual pos vs simulated pos
-        const diff = entity.position.minus(player.entity.position)
-        console.log(Math.atan2(diff.x, diff.z) * 180/Math.PI)
-        */
+        // get angle between the velocity difference
+        const diff1 = entity.velocity.minus(player.entity.velocity)
+        const angle1 = Math.atan2(diff1.x, diff1.z)
+        const angle2 = entity.lastState.yaw
 
-        const offset1 = entity.position.minus(entity.lastState.position)
-        const offset2 = player.entity.position.minus(entity.lastState.position)
-
-        const angle1 = Math.atan2(offset1.x, offset1.z) * 180/Math.PI
-        const angle2 = Math.atan2(offset2.x, offset2.z) * 180/Math.PI
-        console.log(`diff: ${angle2 - angle1}`) // we can use this
+        console.log(`angle1: ${angle1 * 180/Math.PI}, angle2: ${angle2 * 180/Math.PI}`)
+        console.log(`diff: ${Angle.difference(angle1, angle2) * 180/Math.PI}`)
     }
 }
