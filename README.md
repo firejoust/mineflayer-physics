@@ -76,7 +76,7 @@ bot.physics.api.getPhysics(entity, controlState)
   Estimate another player's control states based on their velocity
   Note that:
   - the "sprint" state has not been implemented
-  - server-side latency and velocity can cause inaccuracy
+  - velocity applied by the server and connection latency can cause inaccuracy
   
   Arguments:
   - entity (PrismarineEntity): the player's entity
