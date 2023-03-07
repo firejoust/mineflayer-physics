@@ -36,6 +36,17 @@ interface ControlStateStatus {
   sprint: boolean
   sneak: boolean
 }
+
+interface PlayerState {
+  position: Vec3,
+  velocity: Vec3,
+  onGround: boolean,
+  isInWater: boolean,
+  isInLava: boolean,
+  isInWeb: boolean,
+  isCollidedHorizontally: boolean,
+  isCollidedVertically: boolean
+}
 ```
 #### Loading the plugin
 ```js
@@ -51,13 +62,26 @@ bot.loadPlugin(physics.plugin)
 #### Methods
 ```js
 /*
-  Get the player's physics in the current tick
+  Simulate the player's state in the next tick
   
   Arguments:
   - entity (PrismarineEntity): the player's entity
   - controlState (ControlStateStatus): the player's active control states
   
-  Returns: Vec3
+  Returns: PlayerState
 */
 bot.physics.api.getPhysics(entity, controlState)
+
+/*
+  Estimate another player's control states based on their velocity
+  Note that:
+  - the "sprint" state has not been implemented
+  - server-side latency and velocity can cause inaccuracy
+  
+  Arguments:
+  - entity (PrismarineEntity): the player's entity
+  
+  returns: ControlStateStatus
+*/
+bot.physics.api.getControls(entity)
 ```
