@@ -82,7 +82,7 @@ bot.physics.api.getPhysics(entity, controlState)
   Arguments:
   - entity (PrismarineEntity): the player's entity
   
-  returns: ControlStateStatus
+  Returns: ControlStateStatus
 */
 bot.physics.api.getControls(entity)
 ```
