@@ -98,9 +98,9 @@ class Plugin {
         return controls
     }
 
-    Simulation = entity => {
+    Simulation = (() => {
         const self = this
-        return function Simulation() {
+        return function Simulation(entity) {
             let _controls = new ControlState()
             let _callback = () => false
             let _ticks    = 0
@@ -120,25 +120,28 @@ class Plugin {
         
             function execute() {
                 Assert.ok(_ticks, "ticks must be at least 1")
+
                 // initialise the next state
                 const player = new Player()
                 const array  = new Array()
                 let state = fromEntity(self.bot.majorVersion, entity, _controls)
 
-                // continue until ticks reached or condition met
+                // continue until set ticks reached
                 for (let i = 0; i < _ticks; i++) {
-                    self.physics.simulatePlayer(state, self.bot.world).apply(player)
-                    array.push(player.position.clone())
 
-                    // conditions have been met
+                    // update the state in the next tick
+                    self.physics.simulatePlayer(state, self.bot.world).apply(player)
+                    array.push(player.entity.position.clone())
+
+                    // "until" condition has been met
                     if (_callback(player.entity))
                         break
                     else
                         state = fromPlayer(self.bot.majorVersion, entity, player, _controls)
                 }
-                // return the simulated player trajectory
+                // return the player trajectory
                 return array
             }
         }
-    }
+    })()
 }
