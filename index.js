@@ -1,6 +1,7 @@
-const { fromEntity, fromLastState } = require("./src/playerstate")
+const { fromEntity, fromPlayer, fromLastState } = require("./src/playerstate")
 const { Physics } = require("prismarine-physics")
 const Minecraft   = require("minecraft-data")
+const Assert      = require("assert")
 const Motion      = require("./src/inject/motion")
 const Angle       = require("./src/utils/angle")
 
@@ -42,9 +43,9 @@ class Plugin {
         this.physics = Physics(Minecraft(bot.majorVersion), bot.world)
     }
 
-    getPhysics(entity, controlState) {
+    getNextState(entity, controlState) {
         const player = new Player()
-        const state = fromEntity(this.bot.majorVersion, entity, controlState)
+        const state = fromEntity(this.bot.majorVersion, entity, controlState || new ControlState())
 
         // simulate the player into the next tick
         this.physics.simulatePlayer(state, this.bot.world).apply(player)
@@ -95,5 +96,49 @@ class Plugin {
         }
 
         return controls
+    }
+
+    Simulation = entity => {
+        const self = this
+        return function Simulation() {
+            let _controls = new ControlState()
+            let _callback = () => false
+            let _ticks    = 0
+        
+            const Set = callback => {
+                return (...args) => {
+                    callback(...args)
+                    return this
+                }
+            }
+        
+            // define fluent interface
+            this.setControls = Set(_ => _controls = _)
+            this.setTicks    = Set(_ => _ticks = _)
+            this.until       = Set(_ => _callback = _)
+            this.execute     = execute
+        
+            function execute() {
+                Assert.ok(_ticks, "ticks must be at least 1")
+                // initialise the next state
+                const player = new Player()
+                const array  = new Array()
+                let state = fromEntity(self.bot.majorVersion, entity, _controls)
+
+                // continue until ticks reached or condition met
+                for (let i = 0; i < _ticks; i++) {
+                    self.physics.simulatePlayer(state, self.bot.world).apply(player)
+                    array.push(player.position.clone())
+
+                    // conditions have been met
+                    if (_callback(player.entity))
+                        break
+                    else
+                        state = fromPlayer(self.bot.majorVersion, entity, player, _controls)
+                }
+                // return the simulated player trajectory
+                return array
+            }
+        }
     }
 }
