@@ -104,7 +104,7 @@ simulation.setVelocity(x, y, z)
 simulation.setControls(controls)
 simulation.setTicks(ticks)
 simulation.until(state => true)
-simulation.execute()
+simulation.execute() // returns Vec3[]
 
 // or:
 
