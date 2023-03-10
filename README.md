@@ -96,7 +96,7 @@ bot.physics.api.getControls(entity)
   - setVelocity: (this) the initial velocity used in the simulation (optional)
   - setControls: (this) the control states used in the simulation (optional)
   - setTicks:    (this) how long the simulation should last before callback is true
-  - until:       (this) specifies a callback function executed in any given tick
+  - until:       (this) specifies a callback function executed during each tick
   - execute:   (Vec3[]) returns the simulated path taken by the player
 */
 const simulation = new bot.physics.api.Simulation(entity)
