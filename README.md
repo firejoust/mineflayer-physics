@@ -13,9 +13,9 @@
 - Simulate a player's trajectory over a period of time (ticks)
 - (WIP) Calculate the ideal trajectory for a player using pathfinding (simulated control states)
 #### Notes
-This plugin will inject a new property named `lastState` into all entities (players only)
+This plugin will inject a new property named `lastState` into all entities
 
-(updated per tick)
+(players only, updated per tick)
 ### API
 #### Types
 ```js
@@ -94,25 +94,31 @@ bot.physics.api.getControls(entity)
   Arguments:
   - entity (PrismarineEntity) the player's entity
   
-  Builder API:
+  Setters:
   - setVelocity: (this) the initial velocity used in the simulation (optional)
   - setControls: (this) the control states used in the simulation (optional)
   - setTicks:    (this) how long the simulation should last before callback is true
   - until:       (this) specifies a callback function executed during each tick
-  - execute:   (Vec3[]) returns the simulated path taken by the player
+  
+  Getters:
+  - execute: (Vec3[]) returns the simulated path taken by the player
+*/
+
+/*
+  using standard initialisation:
 */
 
 const simulation = new bot.physics.api.Simulation(entity)
 simulation.setVelocity(x, y, z)  // (number) velocity in the x, y, z direction
 simulation.setControls(controls) // (ControlStateStatus) assumed control states during the simulation
 simulation.setTicks(ticks)       // (number) how long the simulation will last before callback is true
-simulation.until(state => true)  // (void) the callback function; includes a single parameter with the 'PlayerState'
+simulation.until(state => true)  // (void) the callback function; has a single parameter for the updated PlayerState
 
 // executes the simulation with the specified arguments
 simulation.execute()
 
 /*
-  or: (using fluent builder pattern)
+  using fluent builder initialisation:
 */
 
 const path = new bot.physics.api.Simulation(entity)
