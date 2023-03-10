@@ -8,12 +8,12 @@
 
 ### Features
 #### Overview
-- Predict player motion in the next tick (position, velocity, etc)
-- Predict a player's control states based on their velocity
-- (WIP) Simulate a player's trajectory over a period of ticks
-- (WIP) Obstacle avoidance using vector based pathfinding (control states)
+- Get a player's state in the next tick (position, velocity, etc)
+- Predict a player's control states based on their current/last state
+- Simulate a player's trajectory over a period of time (ticks)
+- (WIP) Calculate the ideal trajectory for a player using pathfinding (simulated control states)
 #### Notes
-In order to get information from the last tick, this plugin will inject a new property named `lastState` into all players
+This plugin will inject a new property named `lastState` into all entities (players only)
 
 (updated per tick)
 ### API
