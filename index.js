@@ -1,9 +1,11 @@
 const { fromEntity, fromPlayer, fromLastState } = require("./src/playerstate")
+const Motion      = require("./src/inject/motion")
+const Angle       = require("./src/utils/angle")
+
 const { Physics } = require("prismarine-physics")
 const Minecraft   = require("minecraft-data")
 const Assert      = require("assert")
-const Motion      = require("./src/inject/motion")
-const Angle       = require("./src/utils/angle")
+const Vec3        = require("vec3")
 
 const States = [ "back", "left", "forward", "right" ]
 
@@ -101,6 +103,7 @@ class Plugin {
     Simulation = (() => {
         const self = this
         return function Simulation(entity) {
+            let _velocity = new Vec3()
             let _controls = new ControlState()
             let _callback = () => false
             let _ticks    = 0
@@ -112,7 +115,8 @@ class Plugin {
                 }
             }
         
-            // define fluent interface
+            // builder interface
+            this.setVelocity = Set((x, y, z) => _velocity.set(x, y, z))
             this.setControls = Set(_ => _controls = _)
             this.setTicks    = Set(_ => _ticks = _)
             this.until       = Set(_ => _callback = _)
@@ -125,6 +129,9 @@ class Plugin {
                 const player = new Player()
                 const array  = new Array()
                 let state = fromEntity(self.bot.majorVersion, entity, _controls)
+
+                // add the initial velocity
+                state.entity.velocity.add(_velocity)
 
                 // continue until set ticks reached
                 for (let i = 0; i < _ticks; i++) {
