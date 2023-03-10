@@ -105,8 +105,8 @@ class Plugin {
         return function Simulation(entity) {
             let _velocity = new Vec3()
             let _controls = new ControlState()
-            let _callback = () => false
             let _ticks    = 0
+            let _callback = () => false
         
             const Set = callback => {
                 return (...args) => {
