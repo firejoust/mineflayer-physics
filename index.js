@@ -131,7 +131,7 @@ class Plugin {
                 let state = fromEntity(self.bot.majorVersion, entity, _controls)
 
                 // add the initial velocity
-                state.entity.velocity.add(_velocity)
+                state.vel.update(_velocity)
 
                 // continue until set ticks reached
                 for (let i = 0; i < _ticks; i++) {
