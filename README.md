@@ -71,7 +71,8 @@ bot.loadPlugin(physics.plugin)
   Returns: PlayerState
 */
 bot.physics.api.getNextState(entity, controlState)
-
+```
+```js
 /*
   Predict another player's control states based on their velocity
   
@@ -85,7 +86,8 @@ bot.physics.api.getNextState(entity, controlState)
   Returns: ControlStateStatus
 */
 bot.physics.api.getControls(entity)
-
+```
+```js
 /*
   Simulate a player's motion over a period of ticks.
   
@@ -99,14 +101,19 @@ bot.physics.api.getControls(entity)
   - until:       (this) specifies a callback function executed during each tick
   - execute:   (Vec3[]) returns the simulated path taken by the player
 */
-const simulation = new bot.physics.api.Simulation(entity)
-simulation.setVelocity(x, y, z)
-simulation.setControls(controls)
-simulation.setTicks(ticks)
-simulation.until(state => true)
-simulation.execute() // returns Vec3[]
 
-// or:
+const simulation = new bot.physics.api.Simulation(entity)
+simulation.setVelocity(x, y, z)  // (number) velocity in the x, y, z direction
+simulation.setControls(controls) // (ControlStateStatus) assumed control states during the simulation
+simulation.setTicks(ticks)       // (number) how long the simulation will last before callback is true
+simulation.until(state => true)  // (void) the callback function; includes a single parameter with the 'PlayerState'
+
+// executes the simulation with the specified arguments
+simulation.execute()
+
+/*
+  or: (using fluent builder pattern)
+*/
 
 const path = new bot.physics.api.Simulation(entity)
 .setVelocity(0, 0, 0)
