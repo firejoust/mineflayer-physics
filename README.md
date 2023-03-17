@@ -105,7 +105,7 @@ bot.physics.api.getControls(entity)
 */
 
 /*
-  using standard initialisation:
+  using standard api:
 */
 
 const simulation = new bot.physics.api.Simulation(entity)
@@ -118,7 +118,7 @@ simulation.until(state => true)  // (void) the callback function; has a single p
 simulation.execute()
 
 /*
-  using fluent builder initialisation:
+  using fluent builder api:
 */
 
 const path = new bot.physics.api.Simulation(entity)
