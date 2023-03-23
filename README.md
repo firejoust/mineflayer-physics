@@ -104,17 +104,17 @@ bot.physics.api.getControls(entity)
   - entity (PrismarineEntity) the player's entity
   
   Setters:
-  - velocity: (this) the initial velocity used in the simulation
-  - controls: (this) the control states used in the simulation
-  - ticks:    (this) how long the simulation should last before callback is true
-  - until:    (this) specifies a callback that ends the simulation if true
+  - velocity: - initial velocity in the x, y, z direction
+  - controls: - the control states enabled in the simulation
+  - ticks:    - how long the simulation will execute for
+  - until:    - the callback function; simulation will continue until this returns true
 */
 
 const Simulation = new bot.physics.api.Simulation(entity)
-.velocity(x, y, z)    // (number) initial velocity in the x, y, z direction
-.controls(controls)   // (ControlStateStatus) the control states enabled in the simulation
-.ticks(ticks)         // (number) how long the simulation will execute for
-.until(state => true) // (void) the callback function; simulation will continue until this returns true
+.velocity(x, y, z)
+.controls(controls) 
+.ticks(ticks) 
+.until(state => true)
 ```
 #### Running the Simulation
 ```ts
