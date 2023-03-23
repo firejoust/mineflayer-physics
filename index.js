@@ -1,32 +1,15 @@
-const { fromEntity, fromPlayer, fromLastState } = require("./src/playerstate")
+const { getState, getLastState } = require("./src/playerstate")
 const Motion      = require("./src/inject/motion")
 const Angle       = require("./src/utils/angle")
 
 const { Physics } = require("prismarine-physics")
-const Minecraft   = require("minecraft-data")
 const Assert      = require("assert")
-const Vec3        = require("vec3")
 
 const States = [ "back", "left", "forward", "right" ]
 
 module.exports.plugin = function inject(bot) {
     bot.physics.api = new Plugin(bot)
     Motion.inject(bot)
-}
-
-function Player() {
-    this.jumpTicks = null
-    this.jumpQueued = null
-    this.entity = {
-        position: null,
-        velocity: null,
-        onGround: null,
-        isInWater: null,
-        isInLava: null,
-        isInWeb: null,
-        isCollidedHorizontally: null,
-        isCollidedVertically: null
-    }
 }
 
 function ControlState() {
@@ -42,34 +25,27 @@ function ControlState() {
 class Plugin {
     constructor(bot) {
         this.bot = bot
-        this.physics = Physics(Minecraft(bot.majorVersion), bot.world)
+        this.physics = Physics(bot.registry, bot.world)
     }
 
     getNextState(entity, controlState) {
-        const player = new Player()
-        const state = fromEntity(this.bot.majorVersion, entity, controlState || new ControlState())
-
-        // simulate the player into the next tick
-        this.physics.simulatePlayer(state, this.bot.world).apply(player)
-
-        // return entity state
-        return player.entity
+        const state = getState(this.bot.majorVersion, entity, controlState || new ControlState())
+        return this.physics.simulatePlayer(state, this.bot.world)
     }
 
     getControls(entity) {
         const controls = new ControlState()
 
         // initialise the simulated player state
-        const player = new Player()
-        const state = fromLastState(this.bot.majorVersion, entity, new ControlState())
-        this.physics.simulatePlayer(state, this.bot.world).apply(player)
+        const state = getLastState(this.bot.majorVersion, entity, new ControlState())
+        this.physics.simulatePlayer(state, this.bot.world)
 
         // get difference between simulated pos vs. real pos
-        const diff = player.entity.position.minus(entity.position)
+        const diff = state.pos.minus(entity.position)
         const diffAngle = Math.atan2(diff.x, diff.z)
 
         // jump launch
-        controls["jump"] = (entity.position.y - player.entity.position.y) > 0
+        controls["jump"] = (entity.position.y - state.pos.y) > 0
         controls["sneak"] = Boolean(entity.crouching)
 
         // difference between simulated/actual velocity
@@ -103,7 +79,7 @@ class Plugin {
     Simulation = (() => {
         const self = this
         return function Simulation(entity) {
-            let _velocity = new Vec3()
+            let _velocity = null
             let _controls = new ControlState()
             let _ticks    = 0
             let _callback = () => false
@@ -115,9 +91,9 @@ class Plugin {
                 }
             }
         
-            // builder interface
+            // fluent builder interface
             this.setVelocity = Set((x, y, z) => _velocity.set(x, y, z))
-            this.setControls = Set(_ => _controls = _)
+            this.setControls = Set(_ => Object.keys(_controls).forEach(control => _controls[control] = Boolean(_[control])))
             this.setTicks    = Set(_ => _ticks = _)
             this.until       = Set(_ => _callback = _)
             this.execute     = execute
@@ -126,25 +102,21 @@ class Plugin {
                 Assert.ok(_ticks, "ticks must be at least 1")
 
                 // initialise the next state
-                const player = new Player()
                 const array  = new Array()
-                let state = fromEntity(self.bot.majorVersion, entity, _controls)
+                let state = getState(self.bot.majorVersion, entity, _controls)
 
-                // add the initial velocity
-                state.vel.update(_velocity)
+                // add the initial velocity (if set)
+                if (_velocity)
+                    state.vel.update(_velocity)
 
                 // continue until set ticks reached
                 for (let i = 0; i < _ticks; i++) {
-
-                    // update the state in the next tick
-                    self.physics.simulatePlayer(state, self.bot.world).apply(player)
-                    array.push(player.entity.position.clone())
+                    self.physics.simulatePlayer(state, self.bot.world)
+                    array.push(state.pos.clone())
 
                     // "until" condition has been met
-                    if (_callback(player.entity))
+                    if (_callback(state))
                         break
-                    else
-                        state = fromPlayer(self.bot.majorVersion, entity, player, _controls)
                 }
                 // return the player trajectory
                 return array
