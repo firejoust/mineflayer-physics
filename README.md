@@ -11,11 +11,8 @@
 - Get a player's state in the next tick (position, velocity, etc)
 - Predict a player's control states based on their current/last state
 - Simulate a player's trajectory over a period of time (ticks)
-- (WIP) Calculate the ideal trajectory for a player using pathfinding (simulated control states)
 #### Notes
-This plugin will inject a new property named `lastState` into all entities
-
-(players only, updated per tick)
+This plugin will inject a new property named `lastState` into all players
 ### API
 #### Types
 ```js
@@ -82,9 +79,8 @@ bot.loadPlugin(physics.plugin)
   
   Returns: PlayerState
 */
-bot.physics.api.getNextState(entity, controlState)
-```
-```js
+bot.physics.getNextState(entity, controlState)
+
 /*
   Predict another player's control states based on their velocity
   
@@ -99,6 +95,7 @@ bot.physics.api.getNextState(entity, controlState)
 */
 bot.physics.api.getControls(entity)
 ```
+#### Player Simulation
 ```js
 /*
   Simulate a player's motion over a period of ticks.
@@ -107,36 +104,30 @@ bot.physics.api.getControls(entity)
   - entity (PrismarineEntity) the player's entity
   
   Setters:
-  - setVelocity: (this) the initial velocity used in the simulation (optional)
-  - setControls: (this) the control states used in the simulation (optional)
-  - setTicks:    (this) how long the simulation should last before callback is true
-  - until:       (this) specifies a callback function executed during each tick
+  - velocity: (this) the initial velocity used in the simulation
+  - controls: (this) the control states used in the simulation
+  - ticks:    (this) how long the simulation should last before callback is true
+  - until:    (this) specifies a callback that ends the simulation if true
   
   Getters:
   - execute: (Vec3[]) returns the simulated path taken by the player
 */
 
+const Simulation = new bot.physics.api.Simulation(entity)
+.velocity(x, y, z)    // (number) initial velocity in the x, y, z direction
+.controls(controls)   // (ControlStateStatus) the control states enabled in the simulation
+.ticks(ticks)         // (number) how long the simulation will execute for
+.until(state => true) // (void) the callback function; simulation will continue until this returns true
+```
+#### Executing the Simulation
+```ts
 /*
-  using standard api:
+  Executes the simulation and returns the callback status
 */
-
-const simulation = new bot.physics.api.Simulation(entity)
-simulation.setVelocity(x, y, z)  // (number) velocity in the x, y, z direction
-simulation.setControls(controls) // (ControlStateStatus) assumed control states during the simulation
-simulation.setTicks(ticks)       // (number) how long the simulation will last before callback is true
-simulation.until(state => true)  // (void) the callback function; has a single parameter for the updated PlayerState
-
-// executes the simulation with the specified arguments
-simulation.execute()
+const status: boolean = Simulation.execute()
 
 /*
-  using fluent builder api:
+  Executes the simulation and returns the player's position in each tick
 */
-
-const path = new bot.physics.api.Simulation(entity)
-.setVelocity(0, 0, 0)
-.setControls(controls)
-.setTicks(ticks)
-.until(state => true)
-.execute()
+const trajectory: Vec3[] = Simulation.trajectory()
 ```
