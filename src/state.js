@@ -1,7 +1,8 @@
-const Physics = require("prismarine-physics")
+module.exports = function PlayerState(Physics, version) {
+    this.getState     = getState
+    this.getLastState = getLastState
 
-module.exports = class PlayerState {
-    static getState(version, entity, controlState) {
+    function getState(entity, controls) {
         return new Physics.PlayerState({
             entity: {
                 position: entity.position.clone(),
@@ -18,12 +19,12 @@ module.exports = class PlayerState {
             },
             inventory: { slots: [] },
             jumpTicks: 0,
-            jumpQueued: controlState["jump"],
+            jumpQueued: controls["jump"],
             version
-        }, controlState)
+        }, controls)
     }
 
-    static getLastState(version, entity, controlState) {
+    function getLastState(entity, controls) {
         return new Physics.PlayerState({
             entity: {
                 position: entity.lastState.position.clone(),
@@ -42,6 +43,6 @@ module.exports = class PlayerState {
             jumpTicks: 0,
             jumpQueued: false,
             version
-        }, controlState)
+        }, controls)
     }
 }
