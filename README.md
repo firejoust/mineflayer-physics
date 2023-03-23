@@ -93,7 +93,7 @@ bot.physics.getNextState(entity, controlState)
   
   Returns: ControlStateStatus
 */
-bot.physics.api.getControls(entity)
+bot.physics.getControls(entity)
 ```
 #### Player Simulation
 ```js
@@ -110,7 +110,7 @@ bot.physics.api.getControls(entity)
   - until:    - the callback function; simulation will continue until this returns true
 */
 
-const Simulation = new bot.physics.api.Simulation(entity)
+const Simulation = new bot.physics.Simulation(entity)
 .velocity(x, y, z)
 .controls(controls) 
 .ticks(ticks) 
