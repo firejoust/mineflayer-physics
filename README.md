@@ -108,9 +108,6 @@ bot.physics.api.getControls(entity)
   - controls: (this) the control states used in the simulation
   - ticks:    (this) how long the simulation should last before callback is true
   - until:    (this) specifies a callback that ends the simulation if true
-  
-  Getters:
-  - execute: (Vec3[]) returns the simulated path taken by the player
 */
 
 const Simulation = new bot.physics.api.Simulation(entity)
