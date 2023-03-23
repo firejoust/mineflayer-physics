@@ -1,9 +1,9 @@
-module.exports = function PlayerState(Physics, version) {
+module.exports = function PlayerState(Prismarine, version) {
     this.getState     = getState
     this.getLastState = getLastState
 
     function getState(entity, controls) {
-        return new Physics.PlayerState({
+        return new Prismarine.PlayerState({
             entity: {
                 position: entity.position.clone(),
                 velocity: entity.velocity.clone(),
@@ -25,7 +25,7 @@ module.exports = function PlayerState(Physics, version) {
     }
 
     function getLastState(entity, controls) {
-        return new Physics.PlayerState({
+        return new Prismarine.PlayerState({
             entity: {
                 position: entity.lastState.position.clone(),
                 velocity: entity.lastState.velocity.clone(),

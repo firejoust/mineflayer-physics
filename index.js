@@ -9,12 +9,13 @@ const Controls = [ "back", "left", "forward", "right" ]
 
 module.exports.plugin = function inject(bot) {
     const physics = new Plugin(bot)
+    // inject entity handler
+    Motion.inject(bot)
     // inject methods into original physics object
     bot.physics.getNextState = physics.getNextState
     bot.physics.getControls  = physics.getControls
     bot.physics.Simulation   = physics.Simulation
-    // inject entity handler
-    Motion.inject(bot)
+
 }
 
 function ControlState() {
@@ -28,8 +29,8 @@ function ControlState() {
 }
 
 function Plugin(bot) {
+    const Player  = new State(Prismarine, bot.majorVersion)
     const Physics = Prismarine.Physics(bot.registry, bot.world)
-    const Player  = new State(Physics, bot.majorVersion)
 
     this.getNextState = getNextState
     this.getControls  = getControls
@@ -44,7 +45,7 @@ function Plugin(bot) {
         const controls = new ControlState()
 
         // initialise the simulated player state
-        const state = Player.getLastState(bot.majorVersion, entity, new ControlState())
+        const state = Player.getLastState(entity, new ControlState())
         Physics.simulatePlayer(state, bot.world)
 
         // get difference between simulated pos vs. real pos

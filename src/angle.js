@@ -8,7 +8,7 @@ module.exports.inverse = function(angle) {
 // returns the smaller difference between two angles
 module.exports.difference = function(a, b) {
     let d1 = b - a
-    let d2 = inverse(d1)
+    let d2 = module.exports.inverse(d1)
     // get the smaller angle difference
     return Math.abs(d1) < Math.abs(d2)
     ? d1
