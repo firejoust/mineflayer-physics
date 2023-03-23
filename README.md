@@ -38,14 +38,26 @@ interface ControlStateStatus {
 }
 
 interface PlayerState {
-  position: Vec3,
-  velocity: Vec3,
+  pos: Vec3,
+  vel: Vec3,
   onGround: boolean,
   isInWater: boolean,
   isInLava: boolean,
-  isInWeb: boolean,
+  isInWeb: boolean?,
   isCollidedHorizontally: boolean,
-  isCollidedVertically: boolean
+  isCollidedVertically: boolean,
+  jumpTicks: number,
+  jumpQueued: boolean,
+  attributes: Object,
+  yaw: number,
+  control: ControlStateStatus,
+  jumpBoost: number,
+  speed: number,
+  slowness: number,
+  dolphinsGrace: number,
+  slowFalling: number,
+  levitation: number,
+  depthStrider: number
 }
 ```
 #### Loading the plugin
