@@ -11,7 +11,7 @@
 - Get a player's state in the next tick (position, velocity, etc)
 - Predict a player's control states based on their current/last state
 - Simulate a player's trajectory over a period of time (ticks)
-#### Notes
+#### Note:
 This plugin will inject a new property named `lastState` into all players
 ### API
 #### Types
@@ -119,7 +119,7 @@ const Simulation = new bot.physics.api.Simulation(entity)
 .ticks(ticks)         // (number) how long the simulation will execute for
 .until(state => true) // (void) the callback function; simulation will continue until this returns true
 ```
-#### Executing the Simulation
+#### Running the Simulation
 ```ts
 /*
   Executes the simulation and returns the callback status
