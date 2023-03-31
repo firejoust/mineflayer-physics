@@ -106,13 +106,15 @@ bot.physics.getControls(entity)
   Setters:
   - velocity: - initial velocity in the x, y, z direction
   - controls: - the control states enabled in the simulation
+  - yaw:      - the yaw angle used during the simulation
   - ticks:    - how long the simulation will execute for
   - until:    - the callback function; simulation will continue until this returns true
 */
 
 const Simulation = new bot.physics.Simulation(entity)
 .velocity(x, y, z)
-.controls(controls) 
+.controls(controls)
+.yaw(yaw)
 .ticks(ticks) 
 .until(state => true)
 ```
