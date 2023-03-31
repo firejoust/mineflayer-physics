@@ -91,6 +91,7 @@ function Plugin(bot) {
         let _ticks    = 0
         let _callback = () => false
         let _velocity = null
+        let _yaw      = null
         let _controls = new ControlState()
     
         const Set = callback => {
@@ -102,6 +103,7 @@ function Plugin(bot) {
 
         // Setters
         this.ticks    = Set(_ => _ticks = _)
+        this.yaw      = Set(_ => _yaw = _)
         this.until    = Set(_ => _callback = _)
         this.velocity = Set((x, y, z) => _velocity.set(x, y, z))
         this.controls = Set(_ => Object.keys(_controls).forEach(control => _controls[control] = Boolean(_[control])))
@@ -117,8 +119,11 @@ function Plugin(bot) {
             const state = Player.getState(entity, _controls)
 
             // add the initial velocity (if set)
-            if (_velocity)
+            if (_velocity !== null)
                 state.vel.update(_velocity)
+
+            if (_yaw !== null)
+                state.yaw = _yaw
 
             // continue until set ticks reached
             for (let i = 0; i < _ticks; i++) {
