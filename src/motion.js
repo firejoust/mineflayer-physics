@@ -1,74 +1,81 @@
-module.exports.inject = bot => {
-    stateHandler(bot)
-}
+const StateProperties = [
+    'yaw',
+    'onGround',
+    'isInWater',
+    'isInLava',
+    'isInWeb',
+    'isCollidedHorizontally',
+    'isCollidedVertically'
+]
 
-function stateHandler(bot) {
-    // noop
-    let nextTick = () => {}
-
-    bot.on("physicsTick", function update() {
-        // get all entities in the current tick
-        const entities = Object.values(bot.entities)
-
-        // run the previous tick (update state from the last tick)
-        nextTick()
-
-        // initialise lastState if not already set
-        for (let entity of entities)
-            if (entity.type === "player") 
-                if (entity._lastState === undefined) {
-                    entity._lastState = new EntityState(entity)
-                    entity.lastState  = new EntityState(entity)
-                } else
-                    updateStates(entity)
-
-        // copy the saved state from the last tick
-        nextTick = function tick() {
-            for (let entity of entities)
-                if (entity.type === "player")
-                    entity.lastState = entity.lastState === undefined
-                    ? new EntityState(entity._lastState)
-                    : copyStates(entity)
-        }
+function State(state) {
+    this.position = state.position.clone()
+    this.velocity = state.velocity.clone()
+    StateProperties.forEach(property => {
+        this[property] = state[property]
     })
 }
 
-// black magic 🪄
-
-function EntityState(state) {
-    this.yaw       = state.yaw
-    this.position  = state.position.clone()
-    this.velocity  = state.velocity.clone()
-    this.onGround  = state.onGround
-    this.isInWater = state.isInWater
-    this.isInLava  = state.isInLava
-    this.isInWeb   = state.isInWeb
-    this.isCollidedHorizontally = state.isCollidedHorizontally
-    this.isCollidedVertically   = state.isCollidedVertically
+function saveState(entity) {
+    entity._lastState.position = entity.position.clone()
+    entity._lastState.velocity = entity.velocity.clone()
+    StateProperties.forEach(property => {
+        entity._lastState[property] = entity[property]
+    })
 }
 
-function updateStates(entity) {
-    entity._lastState.yaw       = entity.yaw
-    entity._lastState.position  = entity.position.clone()
-    entity._lastState.velocity  = entity.velocity.clone()
-    entity._lastState.onGround  = entity.onGround
-    entity._lastState.isInWater = entity.isInWater
-    entity._lastState.isInLava  = entity.isInLava
-    entity._lastState.isInWeb   = entity.isInWeb
-    entity._lastState.isCollidedHorizontally = entity.isCollidedHorizontally
-    entity._lastState.isCollidedVertically   = entity.isCollidedVertically
-    return entity._lastState
+function copyState(entity) {
+    entity.lastState.position = entity._lastState.position.clone()
+    entity.lastState.velocity = entity._lastState.velocity.clone()
+    StateProperties.forEach(property => {
+        entity.lastState[property] = entity._lastState[property]
+    })
 }
 
-function copyStates(entity) {
-    entity.lastState.yaw       = entity._lastState.yaw
-    entity.lastState.position  = entity._lastState.position.clone()
-    entity.lastState.velocity  = entity._lastState.velocity.clone()
-    entity.lastState.onGround  = entity._lastState.onGround
-    entity.lastState.isInWater = entity._lastState.isInWater
-    entity.lastState.isInLava  = entity._lastState.isInLava
-    entity.lastState.isInWeb   = entity._lastState.isInWeb
-    entity.lastState.isCollidedHorizontally = entity._lastState.isCollidedHorizontally
-    entity.lastState.isCollidedVertically   = entity._lastState.isCollidedVertically
-    return entity.lastState
+module.exports.inject = function inject(bot) {
+    let nextTick = new function() {
+        this.execute = () => {}
+    }
+
+    bot.on("physicsTick", function update() {
+        nextTick.execute()
+        tick(bot, nextTick)
+    })
+}
+
+function tick(bot, nextTick) {
+    // initialise the last state in the current tick
+    {
+        const entities = Object.values(bot.entities)
+
+        entities.forEach(entity => {
+            if (entity.type === "player") {
+                if (entity._lastState === undefined) {
+                    entity._lastState = new State(entity)
+                    entity.lastState  = new State(entity)
+                } else {
+                    saveState(entity)
+                }
+            }
+        })
+    }
+
+    // update the last state in the next tick
+    {
+        const entities = Object.values(bot.entities)
+
+        function tick() {
+            entities.forEach(entity => {
+                if (entity.type === "player") {
+                    if (entity.lastState === undefined) {
+                        entity.lastState = new State(entity._lastState)
+                    } else {
+                        entity.lastState = copyState(entity)
+                    }
+                }
+            })
+        }
+
+        nextTick.execute = tick
+    }
 }
