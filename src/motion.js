@@ -44,32 +44,26 @@ module.exports.inject = function inject(bot) {
 }
 
 function tick(bot, nextTick) {
-    // initialise the last state in the current tick
-    {
-        const entities = Object.values(bot.entities)
+    const entities = Object.values(bot.entities)
 
-        entities.forEach(entity => {
-            if (entity.type === "player") {
-                if (entity._lastState === undefined) {
-                    entity._lastState = new State(entity)
-                    entity.lastState  = new State(entity)
-                } else {
-                    saveState(entity)
-                }
+    // initialise the lastState property for all entities
+    entities.forEach(entity => {
+        if (entity.type === "player") {
+            if (entity._lastState === undefined) {
+                entity._lastState = new State(entity)
+                entity.lastState  = new State(entity)
+            } else {
+                saveState(entity)
             }
-        })
-    }
+        }
+    })
 
-    // update the last state in the next tick
+    // update the lastState property in the next tick
     {
-        const entities = Object.values(bot.entities)
-
         function tick() {
             entities.forEach(entity => {
                 if (entity.type === "player") {
-                    if (entity.lastState === undefined) {
-                        entity.lastState = new State(entity._lastState)
-                    } else {
+                    if (entity.lastState) {
                         entity.lastState = copyState(entity)
                     }
                 }
