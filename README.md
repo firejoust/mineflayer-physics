@@ -112,11 +112,11 @@ bot.physics.getControls(entity)
 */
 
 const Simulation = new bot.physics.Simulation(entity)
-.velocity(x, y, z)
-.controls(controls)
-.yaw(yaw)
-.ticks(ticks) 
-.until(state => true)
+  .velocity(x, y, z)
+  .controls(controls)
+  .yaw(yaw)
+  .ticks(ticks) 
+  .until(state => true)
 ```
 #### Running the Simulation
 ```ts
