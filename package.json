@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/firejoust/mineflayer-physics/issues"
   },
-  "homepage": "https://github.com/firejoust/mineflayer-physics#readme"
+  "homepage": "https://github.com/firejoust/mineflayer-physics#readme",
+  "dependencies": {
+    "prismarine-physics": "^1.6.0"
+  }
 }
